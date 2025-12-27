@@ -1,26 +1,79 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { ENV } from "../config/ENV.js";
 
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
         unique: true,
-        trim: true
+        trim: true,
+        lowercase: true,
+        index: true
     },
-    fullname: {
+    fullName: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     password: {
         type: String,
-        required: true,
+        required: [true, "password is required"],
         minLength: 6
     },
     avatar: {
         type: String,
         default: ""
+    },
+    refreshToken: {
+        type: String,
     }
 },{timestamps: true})
+
+
+// pre hook to hash password before saving
+userSchema.pre("save", async function (next){
+    if(!this.isModified("password")) {return next()}
+
+    this.password = await bcrypt.hash(this.password, 12);
+    next();
+})
+
+
+// method to compare password entered
+userSchema.methods.isPasswordValid = async function(enteredPassword){
+    return bcrypt.compare(enteredPassword, this.password);
+}
+
+// method to generate access token
+userSchema.methods.generateAccessToken = async function(){
+    return await jwt.sign(
+        {
+            _id: this._id,
+        },
+        ENV.ACCESS_SECRET,
+        {
+            expiresIn: ENV.ACCESS_EXPIRY,
+        }
+    )
+}
+
+
+// method to generate refresh token
+userSchema.methods.generateRefreshToken = async function() {
+    return await jwt.sign(
+        {
+            _id: this._id,
+            email: this.email
+        },
+        ENV.REFRESH_SECRET,
+        {
+            expiresIn: ENV.REFRESH_EXPIRY
+        }
+    )
+}
+
 
 export const User = mongoose.model("User", userSchema)
 
