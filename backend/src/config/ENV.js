@@ -4,7 +4,7 @@ dotenv.config();
 const ENV = {
     PORT: process.env.PORT,
     MONGODB_URI: process.env.MONGODB_URI,
-    JWT_SECRET: process.env.JWT_SECRET,
+    NODE_ENV: process.env.NODE_ENV,
     ORIGIN: process.env.ORIGIN,
     ACCESS_EXPIRY: process.env.ACCESS_TOKEN_EXPIRY,
     ACCESS_SECRET: process.env.ACCESS_TOKEN_SECRET_KEY,
