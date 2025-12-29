@@ -9,6 +9,7 @@ if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true });
 }
 
+// storage option for multer
 const storage = multer.diskStorage({
     destination: (req, file, cb)=> {
         cb(null, tempDir)
@@ -22,6 +23,7 @@ const storage = multer.diskStorage({
 
 const allowedMimeTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
+// File filtering using multer 
 const fileFilter = (req, file, cb) => {
     if(allowedMimeTypes.includes(file.mimeType)){
         cb(null, true)
@@ -30,6 +32,7 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
+// file limit 10 MB
 const limits = {
     fileSize: 10 * 1024 * 1024 // 10 MB Size
 }
