@@ -104,3 +104,26 @@ const login = asyncHandler(async (req, res) => {
         new ApiResponse(200, "login successful", loginUser)
     )
 })
+
+//logout controller 
+const logout = asyncHandler(async (req ,res) => {
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $unset: {refreshToken: 1}
+        },
+        {new: true}
+    )
+
+    const options = {
+        httpOnly: true,
+        secure: ENV.NODE_ENV !== "development"
+    }
+
+    res.status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(
+        new ApiResponse(200, "user logout successful")
+    )
+})
