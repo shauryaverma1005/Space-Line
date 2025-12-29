@@ -8,9 +8,12 @@ import { ENV } from "../config/ENV.js";
   api_secret: ENV.CLOUDINARY_API_SECRET,
 });
 
+// upload file on cloudinary
 const uploadOnCloudinary = async (localPath)=> {
     try {
-        if(!localPath) return null;
+        if(!localPath){
+            return null
+        }
     
         const response = await cloudinary.uploader.upload(localPath, {
             resource_type: "auto"
@@ -30,4 +33,30 @@ const uploadOnCloudinary = async (localPath)=> {
     }
 }
 
-export {uploadOnCloudinary}
+// delete file from cloudinary
+const deleteOnCloudinary = async (publicId) => {
+  if (!publicId) return { status: "skipped", message: "No publicId provided" };
+
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+
+    return {
+      status: "success",
+      message: "Cloudinary file deleted",
+      result,
+    };
+  } catch (error) {
+    console.error("❌ Cloudinary delete failed:", error.message || error);
+
+    return {
+      status: "error",
+      message: "Failed to delete Cloudinary file",
+      error: error.message || error,
+    };
+  }
+};
+
+export {
+    uploadOnCloudinary,
+    deleteOnCloudinary
+}
