@@ -6,7 +6,6 @@ import { ENV } from "../config/ENV.js";
 import {ApiResponse} from "../utils/ApiResponse.js"
 
 
-
 // Generate access and refresh token 
 const generateAccessAndRefreshToken = asyncHandler( async (userId)=> {
     const user = await User.findById(userId)
