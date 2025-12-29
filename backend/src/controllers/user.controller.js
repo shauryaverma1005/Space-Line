@@ -107,10 +107,15 @@ const login = asyncHandler(async (req, res) => {
 
 //logout controller 
 const logout = asyncHandler(async (req ,res) => {
-    const user = await User.findByIdAndUpdate(
+
+    if(!req.user?._id){
+        throw new ApiError(400, "User not authenticated")
+    }
+
+    await User.findByIdAndUpdate(
         req.user._id,
         {
-            $unset: {refreshToken: 1}
+            $unset: {refreshToken: ""}
         },
         {new: true}
     )
