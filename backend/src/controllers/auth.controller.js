@@ -1,14 +1,12 @@
-import mongoose from "mongoose";
 import { User } from "../models/user.model.js";
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import { ENV } from "../config/ENV.js";
 import {ApiResponse} from "../utils/ApiResponse.js"
-import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 
 
 // Generate access and refresh token 
-const generateAccessAndRefreshToken = asyncHandler( async (userId)=> {
+const generateAccessAndRefreshToken = async (userId)=> {
     const user = await User.findById(userId)
 
     if(!user){
@@ -21,11 +19,13 @@ const generateAccessAndRefreshToken = asyncHandler( async (userId)=> {
     await user.save({ validateBeforeSave: false })
 
     return {accessToken, refreshToken};
-})
+}
 
 // signup controller
 const signup = asyncHandler( async (req, res)=> {
+
     const {email, fullName, password} = req.body
+    console.log(email, fullName, password)
 
     if([email, fullName, password].some((field) => field?.trim() ==="")){
         throw new ApiError(400, "All fields are required")
@@ -58,6 +58,7 @@ const signup = asyncHandler( async (req, res)=> {
     const option = {
         httpOnly: true,
         secure: ENV.NODE_ENV!=="development",
+        sameSite: "lax"
     }
 
     res.status(200)
@@ -94,7 +95,7 @@ const login = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: ENV.NODE_ENV!=="development"
+        secure: ENV.NODE_ENV!=="development",
     }
 
     res.status(200)
@@ -122,7 +123,7 @@ const logout = asyncHandler(async (req ,res) => {
 
     const options = {
         httpOnly: true,
-        secure: ENV.NODE_ENV !== "development"
+        secure: ENV.NODE_ENV !== "development",
     }
 
     res.status(200)
@@ -133,42 +134,7 @@ const logout = asyncHandler(async (req ,res) => {
     )
 })
 
-const updateAvatar = asyncHandler( async(req, res) => {
-    const avatarLocalPath = req.file?.path
-
-    if(!avatarLocalPath){
-        throw new ApiError(400, "Image file is missing")
-    }
-
-    const response = await uploadOnCloudinary(avatarLocalPath)
-
-    if(!response) {
-        throw new ApiError(400, "Error uploading file to cloudinary")
-    }
-
-    const user = await User.findById(req.user._id)
-    if (user.avatarPublicId) {
-        const deleteResult = await deleteOnCloudinary(user.avatarPublicId);
-        if (deleteResult.status === "error") {
-            console.log(" Failed to delete old avatar from cloudinary");
-        }
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(
-        req.user._id,
-        {
-            $set:{avatarPublicId: response.public_id, 
-                avatar: response.secure_url
-            }
-        },
-        {new: true}
-    ).select("-password -refreshToken")
-
-    res.status(200).json(
-        new ApiResponse(200, "Avatar uploaded successfully", updatedUser)
-    )
-})
-
+//getUser details
 const getUser = asyncHandler( async (req, res)=>{
    if (!req.user?.email) {
         throw new ApiError(401, "User not authenticated");
@@ -191,5 +157,5 @@ export {
     signup,
     login,
     logout,
-    updateAvatar
+    getUser
 }
