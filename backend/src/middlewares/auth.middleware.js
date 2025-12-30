@@ -6,30 +6,27 @@ import {ENV} from "../config/ENV.js"
 
 
 const auth = asyncHandler(async (req, res, next)=>{
-   try {
-     const accessToken = res.cookie?.accessToken
+     const accessToken = req.cookie?.accessToken
  
-     if(!accessToken){
-         throw new ApiError(400, "User not authenticated")
-     }
+    if (!accessToken) {
+        throw new ApiError(401, "User not authenticated. Token missing.");
+    }
  
-     const decodedToken = jwt.verify(accessToken, ENV.ACCESS_SECRET)
+    let decodedToken;
+    try {
+        decodedToken = jwt.verify(accessToken, ENV.ACCESS_SECRET);
+    } catch (err) {
+        throw new ApiError(403, "Token is invalid or expired.");
+    }
  
-     if(!decodedToken){
-         throw new ApiError(400, "Invalid Token")
-     }
+    const user = await User.findById(decodedToken._id).select("-password -refreshToken");
  
-     const user = await User.findById(decodedToken._id)
- 
-     if(!user){
-         throw new ApiError(400, "Invalid Token user not found")
-     }
+    if (!user) {
+        throw new ApiError(404, "User not found for this token.");
+    }
  
      req.user = user
      next();
-   } catch (error) {
-      throw new ApiError(400, error?.message || "Invalid Access Token ")
-   }
 })
 
 export {auth}
