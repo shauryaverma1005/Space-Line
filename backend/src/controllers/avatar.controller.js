@@ -21,6 +21,7 @@ const updateAvatar = asyncHandler( async(req, res) => {
     const user = await User.findById(req.user._id)
     if (user.avatarPublicId) {
         const deleteResult = await deleteOnCloudinary(user.avatarPublicId);
+        console.log(`delete successful: ${deleteResult}`)
         if (deleteResult.status === "error") {
             console.log(" Failed to delete old avatar from cloudinary");
         }
