@@ -15,4 +15,27 @@ const getUsers = asyncHandler(async (req, res)=> {
     )
 })
 
+const getMessages = asyncHandler(async (req, res)=> {
+    const myID = req.user._id;
+    if(!myID){
+        throw new ApiError(400, "User not authenticated")
+    }
+
+    const {id: ChatPersonId} = req.param
+    if(!ChatPersonId){
+        throw new ApiError(400, "Chat person id not found")
+    }
+
+    const messages = await Message.find({
+        $or : [{senderId: myID, receiverId: ChatPersonId},
+                {senderId: ChatPersonId, receiverId: myID}
+        ]
+    })
+
+    res.status(200).json(
+        new ApiResponse(200, "Messages fetched successfully", messages)
+    )
+
+})
+
 export {getUsers}
