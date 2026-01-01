@@ -38,4 +38,7 @@ const getMessages = asyncHandler(async (req, res)=> {
 
 })
 
-export {getUsers}
+export {
+    getUsers,
+    getMessages
+}

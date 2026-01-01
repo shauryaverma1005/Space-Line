@@ -21,9 +21,11 @@ app.use(cookieParser())
 // Importing routes here
 import userRoutes from "./routes/auth.routes.js"
 import avatarRoutes from "./routes/avatar.routes.js"
+import messageRoutes from "./routes/messages.routes.js"
 
 app.use("/api/v1/auth", userRoutes)
 app.use("/api/v1/avatar", avatarRoutes)
+app.use("api/v1/messages", messageRoutes)
 
 app.use(errorHandler);
 
