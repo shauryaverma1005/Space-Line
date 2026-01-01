@@ -21,9 +21,9 @@ const getMessages = asyncHandler(async (req, res)=> {
         throw new ApiError(400, "User not authenticated")
     }
 
-    const {id: ChatPersonId} = req.param
+    const {id: ChatPersonId} = req.params
     if(!ChatPersonId){
-        throw new ApiError(400, "Chat person id not found")
+        throw new ApiError(400, "Chat person ID is required")
     }
 
     const messages = await Message.find({
