@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
-import { signup, login, logout } from "../controllers/auth.controller.js";
+import { signup, login, logout, getUser } from "../controllers/auth.controller.js";
 import { auth } from "../middlewares/auth.middleware.js";
 
 const router = Router();
@@ -10,5 +10,7 @@ const uploadNone = multer().none(); // parse multipart/form-data fields
 router.post("/signup", uploadNone, signup);
 router.post("/login", uploadNone, login);
 router.post("/logout", auth, logout);
+
+router.get("/profile", auth, getUser)
 
 export default router;
