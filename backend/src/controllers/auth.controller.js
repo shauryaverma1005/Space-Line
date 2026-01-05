@@ -135,22 +135,16 @@ const logout = asyncHandler(async (req ,res) => {
 })
 
 //getUser details
-const getUser = asyncHandler( async (req, res)=>{
-   if (!req.user?.email) {
-        throw new ApiError(401, "User not authenticated");
-    }
+const getUser = asyncHandler(async (req, res) => {
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      "User fetched successfully!",
+      req.user
+    )
+  );
+});
 
-    const user = await User.findOne({ email: req.user.email })
-        .select("-password -refreshToken");
-
-    if (!user) {
-        throw new ApiError(404, "User not found");
-    }
-
-    return res.status(200).json(
-        new ApiResponse(200, "User fetched successfully!", user)
-    );
-})
 
 
 export {
