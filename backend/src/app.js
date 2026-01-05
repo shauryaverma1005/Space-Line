@@ -25,7 +25,7 @@ import messageRoutes from "./routes/messages.routes.js"
 
 app.use("/api/v1/auth", userRoutes)
 app.use("/api/v1/avatar", avatarRoutes)
-app.use("api/v1/messages", messageRoutes)
+app.use("/api/v1/messages", messageRoutes)
 
 app.use(errorHandler);
 

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import Navbar from "./components/Navbar.jsx";
 import { Routes, Route, Navigate } from "react-router-dom";
+import {Toaster} from "react-hot-toast"
 import HomePage from "./pages/HomePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
@@ -47,6 +48,8 @@ function App() {
           element={authProfile ? <ProfilePage /> : <Navigate to="/login" />}
         />
       </Routes>
+
+      <Toaster />
     </>
   );
 }
