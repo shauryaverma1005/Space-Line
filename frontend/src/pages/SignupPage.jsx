@@ -1,39 +1,40 @@
-import {useState} from 'react'
-import { useAuthStore } from '../store/useAuthStore.js'
+import { useState } from "react";
+import { useAuthStore } from "../store/useAuthStore";
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User } from "lucide-react";
 import { Link } from "react-router-dom";
-import toast from 'react-hot-toast';
 
-function SignupPage() {
-  const [showPassword, setShowPassword]= useState(false)
-  
+import toast from "react-hot-toast";
+
+const SignUpPage = () => {
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    password: ""
-  })
+    password: "",
+  });
 
-  const {signup, isSigningUp} = useAuthStore()
+  const { signup, isSigningUp } = useAuthStore();
 
-  const validateForm = ()=> {
+  const validateForm = () => {
     if (!formData.fullName.trim()) return toast.error("Full name is required");
     if (!formData.email.trim()) return toast.error("Email is required");
     if (!/\S+@\S+\.\S+/.test(formData.email)) return toast.error("Invalid email format");
     if (!formData.password) return toast.error("Password is required");
     if (formData.password.length < 6) return toast.error("Password must be at least 6 characters");
-    return true;
-  }
 
-  const handleSubmit = (e)=> {
+    return true;
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const success = validateForm()
-    if(success === true){
-      signup(formData)
-    }
-  }
+
+    const success = validateForm();
+
+    if (success === true) signup(formData);
+  };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen grid lg:grid-cols-2">
       {/* left side */}
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
@@ -51,7 +52,7 @@ function SignupPage() {
             </div>
           </div>
 
-          <form  className="space-y-6" onClick={handleSubmit}>
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Full Name</span>
@@ -139,8 +140,9 @@ function SignupPage() {
           </div>
         </div>
       </div>
+
     </div>
   )
 }
 
-export default SignupPage
+export default SignUpPage;
