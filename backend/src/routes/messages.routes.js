@@ -6,7 +6,7 @@ import { getMessages, getUsers } from "../controllers/message.controller.js";
 const router = Router()
 const uploadNone = multer().none()
 
-router.post("/getUsers", auth, uploadNone,getUsers)
-router.post("/getMessages", auth, uploadNone, getMessages);
+router.get("/getUsers", auth, uploadNone,getUsers)
+router.get("/getMessages/:id", auth, uploadNone, getMessages);
 
 export default router;
