@@ -3,6 +3,7 @@ import {Message} from "../models/message.model.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
+import { uploadOnCloudinary } from "../utils/cloudinary.js"
 
 const getUsers = asyncHandler(async (req, res)=> {
     const loggedInUser = req.body._id
@@ -38,7 +39,59 @@ const getMessages = asyncHandler(async (req, res)=> {
 
 })
 
+const sendMessage = asyncHandler(async (req, res)=> {
+    const myId = req?.user?._id
+    const {text} = req.body
+    const { id: receiverId } = req.params
+
+   // Validate sender & receiver
+    const [sender, receiver] = await Promise.all([
+        User.findById(myId),
+        User.findById(receiverId)
+    ]);
+
+    if (!sender) {
+        throw new ApiError(404, "Sender not found");
+    }
+
+    if (!receiver) {
+        throw new ApiError(404, "Receiver not found");
+    }
+
+    if(!(text || req.file?.path)){
+        throw new ApiError(400, "No content to send message")
+    }
+
+    let imageLocalPath;
+    let imageURL= null;
+    if(req.file && req.file?.path){
+        imageLocalPath =req.file?.path
+        const response = await uploadOnCloudinary(imageLocalPath)
+        if(!response){
+            console.log("No image found to upload")
+          }
+          imageURL = response.secure_url
+    }
+
+    const newMessage = await Message.create({
+        senderId: myId,
+        receiverId: receiverId,
+        text:text ?? "",
+        image: imageURL ?? ""
+    })
+
+    if(!newMessage){
+        throw new ApiError(500, "Error Creating message entry in database")
+    }
+
+    res.status(201)
+    .json(
+        new ApiResponse(201, "Message sent successfully", newMessage)
+    )
+})
+
 export {
     getUsers,
-    getMessages
+    getMessages,
+    sendMessage
 }
