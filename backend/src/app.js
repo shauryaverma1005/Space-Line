@@ -30,12 +30,10 @@ app.use("/api/v1/auth", userRoutes)
 app.use("/api/v1/avatar", avatarRoutes)
 app.use("/api/v1/messages", messageRoutes)
 
-// Serve frontend in production (must be after API routes)
-if (ENV.NODE_ENV === "production") {
+if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-  // Express 5 + path-to-regexp v6 does not accept "*". Use a RegExp catch-all.
-  app.get(/^(?!\/api\/).*/, (req, res) => {
+  app.get("/*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
