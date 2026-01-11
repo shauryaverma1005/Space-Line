@@ -1,5 +1,13 @@
 import dotenv from "dotenv";
-dotenv.config();
+import fs from "fs";
+import path from "path";
+
+// In production (e.g., Render), prefer platform environment variables.
+// Only load a local .env file for development / local runs.
+const envPath = path.join(process.cwd(), ".env");
+if (process.env.NODE_ENV !== "production" && fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+}
 
 const ENV = {
     PORT: process.env.PORT,
