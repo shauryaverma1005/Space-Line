@@ -5,6 +5,7 @@ import { Camera, Mail, User } from "lucide-react";
 const ProfilePage = () => {
   const { authProfile, isUpdatingProfile, updateProfile } = useAuthStore();
   const [selectedImg, setSelectedImg] = useState(null);
+
   console.log(authProfile)
 
   const handleImageUpload = async (e) => {
@@ -20,7 +21,6 @@ const ProfilePage = () => {
   await updateProfile(formData);
 };
 
-
   return (
     <div className="h-screen pt-20">
       <div className="max-w-2xl mx-auto p-4 py-8">
@@ -35,7 +35,7 @@ const ProfilePage = () => {
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
               <img
-                src={selectedImg || authProfile?.data?.avatar || "/avatar.jpg"}
+                src={selectedImg || authProfile.data.avatar || "/avatar.jpg"}
                 alt="Profile"
                 className="size-32 rounded-full object-cover border-4 "
               />

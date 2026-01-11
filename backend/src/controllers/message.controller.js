@@ -6,11 +6,11 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 
 const getUsers = asyncHandler(async (req, res)=> {
-    const loggedInUser = req.body._id
+    const loggedInUser = req.user?._id
     if(!loggedInUser){
         throw new ApiError(400,"User not authenticatedd")
     }
-    const AllUser = await User.find({ $ne: {_id: loggedInUser}}).select("-password")
+    const AllUser = await User.find({ _id: { $ne: loggedInUser } }).select("-password")
     res.status(200).json(
         new ApiResponse(200, "All users fetched successfully", AllUser)
     )
