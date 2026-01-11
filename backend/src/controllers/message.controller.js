@@ -4,6 +4,7 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
+import { getReceiverSocketId, io } from "../utils/Socket.js"
 
 const getUsers = asyncHandler(async (req, res)=> {
     const loggedInUser = req.user?._id
@@ -82,6 +83,11 @@ const sendMessage = asyncHandler(async (req, res)=> {
 
     if(!newMessage){
         throw new ApiError(500, "Error Creating message entry in database")
+    }
+
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+        io.to(receiverSocketId).emit("newMessage", newMessage);
     }
 
     res.status(201)

@@ -1,11 +1,11 @@
-import { app } from "./app.js";
+import { server } from "./utils/Socket.js";
 import { connectDB } from "./config/db.js";
 import { ENV } from "./config/ENV.js";
 
 connectDB()
 .then(()=> {
     const PORT = ENV.PORT ?? 3000;
-    app.listen(PORT, ()=> {
+    server.listen(PORT, ()=> {
         console.log(`Server is running at PORT: ${PORT}`)
     })
 })

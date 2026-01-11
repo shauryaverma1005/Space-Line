@@ -19,17 +19,15 @@ const userSocketMap = {}
 
 io.on("connection", (socket)=>{
     console.log(`A user connected: ${socket.id}`)
-    const userId= socket.handshake.query.userID
-      if (userId) {
-        userSocketMap[userId] = socket.id;
-    }
+        const userId = socket.handshake.query.userId || socket.handshake.query.userID
+        if (userId) userSocketMap[userId] = socket.id;
 
     io.emit("getOnlineUsers", Object.keys(userSocketMap) )
 
     socket.on("disconnect", ()=> {
         console.log("A user disconnected", userId)
-        delete userSocketMap[userId]
-        io.emit("getOnlineUsers", Object.keys(userId))
+        if (userId) delete userSocketMap[userId]
+        io.emit("getOnlineUsers", Object.keys(userSocketMap))
     })
 })
 
