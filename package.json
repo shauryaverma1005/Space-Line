@@ -16,6 +16,9 @@
     "shaurya",
     "chatapp"
   ],
+  "engines": {
+  "node": ">=18"
+},
   "author": "Shaurya Kundan",
   "license": "ISC",
   "bugs": {
