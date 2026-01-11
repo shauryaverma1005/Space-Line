@@ -1,10 +1,11 @@
 import { server } from "./utils/Socket.js";
 import { connectDB } from "./config/db.js";
-import { ENV } from "./config/ENV.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 connectDB()
 .then(()=> {
-    const PORT = ENV.PORT ?? 3000;
+    const PORT = process.env.PORT ?? 3000;
     server.listen(PORT, ()=> {
         console.log(`Server is running at PORT: ${PORT}`)
     })

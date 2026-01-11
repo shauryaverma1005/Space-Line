@@ -1,5 +1,4 @@
 import { ApiError } from "../utils/ApiError.js";
-import { ENV } from "../config/ENV.js";
 
 const errorHandler =(err, req, res, next) => {
     if(err instanceof ApiError){
@@ -15,7 +14,7 @@ const errorHandler =(err, req, res, next) => {
             success: false, 
             message: err.message || "Internal Server Error",
             // Only show stack trace in dev
-            stack: ENV.NODE_ENV === "development" ? err.stack : undefined
+            stack: process.env.NODE_ENV === "development" ? err.stack : undefined
     })
 };
 

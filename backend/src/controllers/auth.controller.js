@@ -1,7 +1,6 @@
 import { User } from "../models/user.model.js";
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
-import { ENV } from "../config/ENV.js";
 import {ApiResponse} from "../utils/ApiResponse.js"
 
 
@@ -56,7 +55,7 @@ const signup = asyncHandler( async (req, res)=> {
 
     const option = {
         httpOnly: true,
-        secure: ENV.NODE_ENV!=="development",
+        secure: process.env.NODE_ENV!=="development",
         sameSite: "lax"
     }
 
@@ -94,7 +93,7 @@ const login = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: ENV.NODE_ENV!=="development",
+        secure: process.env.NODE_ENV!=="development",
     }
 
     res.status(200)
@@ -122,7 +121,7 @@ const logout = asyncHandler(async (req ,res) => {
 
     const options = {
         httpOnly: true,
-        secure: ENV.NODE_ENV !== "development",
+        secure: process.env.NODE_ENV !== "development",
     }
 
     res.status(200)
