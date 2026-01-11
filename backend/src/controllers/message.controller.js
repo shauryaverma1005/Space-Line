@@ -4,13 +4,14 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
+import { getReceiverSocketId, io } from "../utils/Socket.js"
 
 const getUsers = asyncHandler(async (req, res)=> {
-    const loggedInUser = req.body._id
+    const loggedInUser = req.user?._id
     if(!loggedInUser){
         throw new ApiError(400,"User not authenticatedd")
     }
-    const AllUser = await User.find({ $ne: {_id: loggedInUser}}).select("-password")
+    const AllUser = await User.find({ _id: { $ne: loggedInUser } }).select("-password")
     res.status(200).json(
         new ApiResponse(200, "All users fetched successfully", AllUser)
     )
@@ -82,6 +83,11 @@ const sendMessage = asyncHandler(async (req, res)=> {
 
     if(!newMessage){
         throw new ApiError(500, "Error Creating message entry in database")
+    }
+
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+        io.to(receiverSocketId).emit("newMessage", newMessage);
     }
 
     res.status(201)

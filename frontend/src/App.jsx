@@ -17,12 +17,17 @@ import { Loader } from "lucide-react";
 
 import "./App.css";
 function App() {
-  const { authProfile, checkAuth, isCheckingAuth } = useAuthStore();
+  const { authProfile, checkAuth, isCheckingAuth, connectSocket, disconnectedSocket } = useAuthStore();
   const { theme } = useThemeStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    if (authProfile) connectSocket();
+    else disconnectedSocket();
+  }, [authProfile, connectSocket, disconnectedSocket]);
 
   if (isCheckingAuth && !authProfile) {
     return (

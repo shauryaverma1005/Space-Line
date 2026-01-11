@@ -3,6 +3,9 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import { ENV } from "./config/ENV.js"
 import { errorHandler } from "./middlewares/errorHandler.middleware.js"
+import path from "path"
+
+const __dirname = path.resolve();
 
 const app = express()
 
@@ -17,6 +20,14 @@ app.use(cors({
 app.use(express.json({limit:"16kb"}))
 app.use(express.urlencoded({extended: true, limit: "16kb"}))
 app.use(cookieParser())
+
+if (ENV.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+  });
+}
 
 // Importing routes here
 import userRoutes from "./routes/auth.routes.js"

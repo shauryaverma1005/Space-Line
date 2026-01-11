@@ -14,7 +14,6 @@ export const useChatStore = create((set, get)=>({
         set({isUsersLoading: true})
         try {
             const res = await axiosInstance.get("/messages/getUsers")
-            console.log(res.data)
             set({users: res.data.data})
         } catch (error) {
             toast.error(error.response.data.message);
@@ -27,8 +26,8 @@ export const useChatStore = create((set, get)=>({
         set({isMessagesLoading: true})
         try {
             const res = await axiosInstance.get(`/messages/getMessages/${userId}`)
-            console.log(res.data)
-            set({ messages: res.data });
+            console.log(res)
+            set({ messages: res.data.data });
         } catch (error) {
             toast.error(error.response.data.message);
         } finally {
@@ -39,8 +38,14 @@ export const useChatStore = create((set, get)=>({
     sendMessage: async (messageData) => {
     const { selectedUser, messages } = get();
     try {
-      const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
-      set({ messages: [...messages, res.data] });
+      const formData = new FormData();
+      if (messageData?.text) formData.append("text", messageData.text);
+      if (messageData?.imageFile) formData.append("image", messageData.imageFile);
+
+      const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, formData);
+      const newMessage = res?.data?.data ?? null;
+      const safeMessages = Array.isArray(messages) ? messages : [];
+      set({ messages: newMessage ? [...safeMessages, newMessage] : safeMessages });
     } catch (error) {
       const message = error?.response?.data?.message || error?.message || "Failed to send message";
       toast.error(message);
@@ -59,13 +64,14 @@ export const useChatStore = create((set, get)=>({
       if (!isMessageSentFromSelectedUser) return;
 
       set({
-        messages: [...get().messages, newMessage],
+        messages: [...(Array.isArray(get().messages) ? get().messages : []), newMessage],
       });
     });
   },
 
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
+    if (!socket) return;
     socket.off("newMessage");
   },
 
