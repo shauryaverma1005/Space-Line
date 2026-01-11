@@ -1,1 +1,1 @@
-export const DB_NAME = "spaceline"
+export const DB_NAME = "space-line"
