@@ -18,12 +18,19 @@ const ChatContainer = () => {
   } = useChatStore();
   const { authProfile } = useAuthStore();
   const messageEndRef = useRef(null);
+  const messageList = Array.isArray(messages) ? messages : [];
 
   useEffect(() => {
+    if (!selectedUser?._id) return;
     getMessages(selectedUser._id);
     subscribeToMessages();
     return () => unsubscribeFromMessages();
-  }, [selectedUser?._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
+  }, [
+    selectedUser?._id,
+    getMessages,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  ]);
 
   useEffect(() => {
     if (messageEndRef.current && messages) {
@@ -46,19 +53,23 @@ const ChatContainer = () => {
       <ChatHeader />
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
+        {messageList.map((message) => (
           <div
             key={message._id}
-            className={`chat ${message.senderId === authProfile?.data?._id ? "chat-end" : "chat-start"}`}
+            className={`chat ${
+              message.senderId === authProfile.data._id
+                ? "chat-end"
+                : "chat-start"
+            }`}
             ref={messageEndRef}
           >
             <div className=" chat-image avatar">
               <div className="size-10 rounded-full border">
                 <img
                   src={
-                    message.senderId === authProfile?.data._id
-                      ? authProfile?.data?.profilePic || "/avatar.png"
-                      : selectedUser?.data?.profilePic || "/avatar.png"
+                    message.senderId === authProfile.data._id
+                      ? authProfile.data.avatar || "/avatar.jpg"
+                      : selectedUser.avatar || "/avatar.jpg"
                   }
                   alt="profile pic"
                 />

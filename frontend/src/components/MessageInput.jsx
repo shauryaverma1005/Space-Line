@@ -6,25 +6,35 @@ import toast from "react-hot-toast";
 const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const fileInputRef = useRef(null);
   const { sendMessage } = useChatStore();
 
+  const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB (must match backend multer limit)
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    if (!file) return;
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      toast.error("Image too large (max 10MB)");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const removeImage = () => {
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
     setImagePreview(null);
+    setImageFile(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -35,12 +45,14 @@ const MessageInput = () => {
     try {
       await sendMessage({
         text: text.trim(),
-        image: imagePreview,
+        imageFile,
       });
 
       // Clear form
       setText("");
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
       setImagePreview(null);
+      setImageFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       console.error("Failed to send message:", error);
